@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!-- saved from url=(0052)http://getbootstrap.com/docs/4.0/examples/dashboard/ -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>主页</title>
+    <!-- Bootstrap core CSS -->
+    <link href="asserts/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.css}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="asserts/css/dashboard.css" th:href="@{/asserts/css/dashboard.css}" rel="stylesheet">
+
+    <style type="text/css">
+        /* Chart.js */
+
+        @-webkit-keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes chartjs-render-animation {
+            from {
+                opacity: 0.99
+            }
+            to {
+                opacity: 1
+            }
+        }
+
+        .chartjs-render-monitor {
+            -webkit-animation: chartjs-render-animation 0.001s;
+            animation: chartjs-render-animation 0.001s;
+        }
+    </style>
+    <script>
+        function query() {
+            var lastName = document.getElementById("lastName").value;
+            var id = document.getElementById("id").value;
+            var curWwwPath = window.document.location.href;
+            var pathName = window.document.location.pathname;
+
+            var pos = curWwwPath.indexOf(pathName);
+            var localhostPaht = curWwwPath.substring(0, pos);
+            var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+            if (id != "" || lastName != "") {
+                window.location = localhostPaht + projectName + "/visitorquery?id=" + id + "&lastName=" + lastName;
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function toLogin() {
+            var curWwwPath = window.document.location.href;
+            var pathName = window.document.location.pathname;
+
+            var pos = curWwwPath.indexOf(pathName);
+            var localhostPaht = curWwwPath.substring(0, pos);
+            var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+            window.location = localhostPaht + projectName + "/tologin";
+        }
+    </script>
+</head>
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <main role="main" class="col-xs-9 col-md-9 ml-sm-auto col-lg-12" align="center">
+            <div id="">
+                <img src="asserts/img/1.jpg" th:src="@{/asserts/img/1.jpg}" width="100%" height="400px" id="img1"/>
+            </div>
+            <div class="table-responsive">
+                <div style="margin:30px">
+                    <input name="id" type="text" placeholder="学号" id="id"/>
+                    <input name="lastName" type="text" placeholder="姓名" id="lastName">
+                    <button type="button" class="btn btn-primary" onclick="return query()"
+                            style="height:29px;line-height: 16px;">查询
+                    </button>
+                    |
+                    <a href="#" th:href="@{/downloadExcel}">下载Excel模版</a>|
+                    <button type="button" class="btn btn-primary" style="height:29px;line-height: 16px;"
+                            onclick="toLogin()">管理员登陆
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped table-sm" style="text-align: center">
+                    <thead>
+                    <tr>
+                        <th>学号</th>
+                        <th>姓名</th>
+                        <th>班级</th>
+                        <th>性别</th>
+                        <th>项目名</th>
+                        <th>项目链接</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="stu:${pageInfo.list}">
+                        <td th:text="${stu.id}"></td>
+                        <td th:text="${stu.lastName}"></td>
+                        <td th:text="${stu.classes}"></td>
+                        <td th:text="${stu.gender}==0?'女':'男'"></td>
+                        <td th:text="${stu.projectName}"></td>
+                        <td><a target="_blank" th:text="${stu.project}" th:href="${stu.project}"></a></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="row">
+                <div class="col-md-6" id="page_info_area">
+                    当前为第[[${pageInfo.pageNum}]]页，总共[[${pageInfo.pages}]]页, 共[[${pageInfo.total}]]条记录
+                </div>
+
+                <div class="col-md-6" id="page_nav_area">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <!--首页-->
+                            <li><a href="#" th:href="@{/visitor?pn=1}" style="text-decoration: none">首页&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                            </li>
+                            <!--上一页-->
+                            <th:block th:if="${pageInfo.hasPreviousPage}">
+                                <li>
+                                    <a href="#" th:href="@{/visitor?pn=}+${pageInfo.prePage}"
+                                       style="text-decoration: none">&laquo;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                </li>
+                            </th:block>
+                            <!--页码-->
+                            <li th:each="pnum:${pageInfo.navigatepageNums}">
+                                <a href="#" th:href="@{/visitor?pn=}+${pnum}"
+                                   th:style="${pnum==pageInfo.pageNum}?'color:red':'color:blue'">
+                                    [[${pnum}]] &nbsp;&nbsp;
+                                </a>
+                            </li>
+                            <!--下一页-->
+                            <th:block th:if="${pageInfo.hasNextPage}">
+                                <li>
+                                    <a href="#" style="text-decoration: none"
+                                       th:href="@{/visitor?pn=}+${pageInfo.nextPage}">&raquo;&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                </li>
+                            </th:block>
+                            <!--末页-->
+                            <li><a href="#" style="text-decoration: none"
+                                   th:href="@{/visitor?pn=}+${pageInfo.pages}">末页</a></li>
+                        </ul>
+                    </nav>
+
+                </div>
+            </div>
+            <div style="width: 100%;height: 100px;margin-top: 10px;text-align: center;line-height: 80px;color: rgba(255,255,255,0.7);font-size: 14px;background-color: #535353;">
+                使用单位：计算机科学与技术
+            </div>
+        </main>
+        <form id="deleteEmpForm" method="post">
+            <input type="hidden" name="_method" value="delete"/>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script type="text/javascript" src="asserts/js/jquery-3.2.1.slim.min.js"
+        th:src="@{/webjars/jquery/3.3.1/jquery.js}"></script>
+<script type="text/javascript" src="asserts/js/popper.min.js"
+        th:src="@{/webjars/popper.js/1.11.1/dist/popper.js}"></script>
+<script type="text/javascript" src="asserts/js/bootstrap.min.js"
+        th:src="@{/webjars/bootstrap/4.0.0/js/bootstrap.js}"></script>
+
+<!-- Icons -->
+<script type="text/javascript" src="asserts/js/feather.min.js" th:src="@{/asserts/js/feather.min.js}"></script>
+<script>
+    feather.replace()
+</script>
+</body>
+</html>
+

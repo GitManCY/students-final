@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>跳转信息</title>
+
+
+</head>
+<body>
+    [[${ImportMsg}]] &nbsp;&nbsp;&nbsp;
+    <a href="#" th:href="@{/students}"><span id="second">2</span>秒后自动为您跳转</a>
+    <script>
+        var interval;
+        window.onload = function startSecond() {
+            interval = window.setInterval("changeSecond()", 1000);
+        };
+
+        function changeSecond() {
+            var second = document.getElementById("second");
+            var svalue = second.innerHTML;
+            svalue = svalue - 1;
+            if (svalue == 0) {
+                window.clearInterval(interval);
+                window.history.go(-1);
+                return;
+            }
+            second.innerHTML = svalue;
+        }
+
+    </script>
+</body>
+</html>
